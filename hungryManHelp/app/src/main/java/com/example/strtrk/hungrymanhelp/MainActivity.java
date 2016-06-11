@@ -17,9 +17,10 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
     private Button buttonGPS;
-    private TextView textGPS;
+    private TextView textGPS, textLat, textLon, textAlt, textTime;
     private LocationListener mlocListener;
     private int getLocationPermission;
+    private double myLat, myLon, myAlt, myTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,8 +61,12 @@ public class MainActivity extends Activity {
         mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mlocListener);
 
 
-        /*Declare a textBox where we display information/status of thing*/
+        /*Declare a textBox where we display information/status of things*/
         textGPS = (TextView) findViewById(R.id.text_GPSdisplay);
+        textLat = (TextView) findViewById(R.id.textLat);
+        textLon = (TextView) findViewById(R.id.textLon);
+        textAlt = (TextView) findViewById(R.id.textAlt);
+        textTime = (TextView) findViewById(R.id.textTime);
         buttonGPS = (Button) findViewById(R.id.buttonGPS);
         buttonGPS.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,21 +82,26 @@ public class MainActivity extends Activity {
 
     }
 
+    /*WORKING HORSE OF GETTING GPS LOC*/
+    /*Where we take an action everytime the GPS updates its location*/
     public class MyLocationListener implements LocationListener {
-
-
-
-
-
 
         @Override
         public void onLocationChanged(Location loc) {
-            loc.getLatitude();
-            loc.getLongitude();
+            myLat = loc.getLatitude();
+            myLon = loc.getLongitude();
+            myTime = loc.getTime();
+            myAlt = loc.getAltitude();
+
             String Text = "My current location is: " +
                     "Latitud = " + loc.getLatitude() +
                     "Longitud = " + loc.getLongitude();
             textGPS.setText(Text);
+            textLat.setText("Lat: "+String.valueOf(myLat));
+            textLon.setText("Lon: "+String.valueOf(myLon));
+            textAlt.setText("Alt: "+String.valueOf(myAlt));
+            textTime.setText("Time: "+String.valueOf(myTime));
+
         }
 
         public void onProviderEnabled(String provider) {
