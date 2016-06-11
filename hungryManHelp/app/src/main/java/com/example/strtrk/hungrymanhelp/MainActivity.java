@@ -6,6 +6,8 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -17,24 +19,49 @@ public class MainActivity extends Activity {
     private Button buttonGPS;
     private TextView textGPS;
     private LocationListener mlocListener;
-
+    private int getLocationPermission;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String permission = "android.permission.ACCESS_FINE_LOCATION";
-        int res = getApplicationContext().checkCallingOrSelfPermission(permission);
-        res = PackageManager.PERMISSION_GRANTED;
+        /*CHECK IF WE HAVE LOCATION PERMISSION*/
+        if (ContextCompat.checkSelfPermission(this,
+                "android.permission.ACCESS_FINE_LOCATION")
+                != PackageManager.PERMISSION_GRANTED) {
 
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    "android.permission.ACCESS_FINE_LOCATION")) {
+
+                // Show an expanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{"android.permission.ACCESS_FINE_LOCATION"},
+                        getLocationPermission);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        }/*END: CHECK IF WE HAVE LOCATION PERMISSION*/
+
+        /*LocationManager that query location everytime it changes*/
         LocationManager mlocManager =
                 (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         mlocListener = new MyLocationListener();
         mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, mlocListener);
 
 
-
+        /*Declare a textBox where we display information/status of thing*/
+        textGPS = (TextView) findViewById(R.id.text_GPSdisplay);
         buttonGPS = (Button) findViewById(R.id.buttonGPS);
         buttonGPS.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -47,15 +74,6 @@ public class MainActivity extends Activity {
 
             }
         });//End setOnClickListener
-
-        /* Use the LocationManager class to obtain GPS locations */
-
-
-
-
-
-
-        textGPS = (TextView) findViewById(R.id.text_GPSdisplay);
 
     }
 
@@ -73,9 +91,7 @@ public class MainActivity extends Activity {
             String Text = "My current location is: " +
                     "Latitud = " + loc.getLatitude() +
                     "Longitud = " + loc.getLongitude();
-            Toast.makeText(getApplicationContext(),
-                    Text,
-                    Toast.LENGTH_SHORT).show();
+            textGPS.setText(Text);
         }
 
         public void onProviderEnabled(String provider) {
